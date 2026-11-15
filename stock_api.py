@@ -1,12 +1,3 @@
-"""Alpha Vantage querying and chart building for the Stock Data Visualizer.
-
-get_data() and make_chart() come from Project 3 (JK-5.py). The changes for the
-web version are:
-  - errors raise StockDataError (shown on the page) instead of print()
-  - make_chart() returns the SVG so Flask can put it in the page, instead of
-    writing chart.svg and opening a browser
-"""
-
 import csv
 import os
 import re
@@ -93,27 +84,22 @@ def get_data(symbol, function):
         "outputsize": "full",
     }
 
-    # needs an interval, the other functions do not
     if function == "TIME_SERIES_INTRADAY":
         params["interval"] = "60min"
 
     data = _request(params)
 
-    # sends errors back inside the json, so check for them
     if "Error Message" in data:
         raise StockDataError("Symbol not found. Check the stock symbol.")
 
-    # the free key may not allow the full 20 years, so try again with less data
     if "Information" in data and params["outputsize"] == "full":
         params["outputsize"] = "compact"
-        time.sleep(2)  # free keys only allow 1 request per second
+        time.sleep(2)
         data = _request(params)
 
     if "Note" in data or "Information" in data:
-        # show what the API actually said so we know the real reason
         raise StockDataError("The API gave a message: " + (data.get("Note") or data.get("Information")))
 
-    # the name of the data section changes depending on the function
     for key in data:
         if "Time Series" in key:
             return data[key]
@@ -129,7 +115,6 @@ def make_chart(symbol, data, chart_type, start, end):
     lows = []
     closes = []
 
-    # go oldest to newest so the chart reads left to right
     for date in sorted(data.keys()):
         day = datetime.strptime(date[:10], "%Y-%m-%d").date()
         if start <= day <= end:
