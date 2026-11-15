@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<form method="POST" action="{{ url_for('index') }}" class="stock-form">
+  <label for="symbol">Choose Symbol</label>
+  <select id="symbol" name="symbol" required>
+    <option value="" disabled {% if not selected.symbol %}selected{% endif %}>Select a stock symbol</option>
+    {% for sym in symbols %}
+      <option value="{{ sym }}" {% if selected.symbol == sym %}selected{% endif %}>{{ sym }}</option>
+    {% endfor %}
+  </select>
+
+  <label for="chart_type">Choose Chart Type</label>
+  <select id="chart_type" name="chart_type" required>
+    <option value="" disabled {% if not selected.chart_type %}selected{% endif %}>Select the chart type</option>
+    {% for value, label in chart_types.items() %}
+      <option value="{{ value }}" {% if selected.chart_type == value %}selected{% endif %}>{{ value }}. {{ label }}</option>
+    {% endfor %}
+  </select>
+
+  <label for="time_series">Choose Time Series</label>
+  <select id="time_series" name="time_series" required>
+    <option value="" disabled {% if not selected.time_series %}selected{% endif %}>Select the time series</option>
+    {% for value, label in time_series.items() %}
+      <option value="{{ value }}" {% if selected.time_series == value %}selected{% endif %}>{{ value }}. {{ label }}</option>
+    {% endfor %}
+  </select>
+
+  <label for="start_date">Start Date</label>
+  <input type="date" id="start_date" name="start_date" max="{{ today }}" value="{{ selected.start_date or '' }}" required>
+
+  <label for="end_date">End Date</label>
+  <input type="date" id="end_date" name="end_date" max="{{ today }}" value="{{ selected.end_date or '' }}" required>
+
+  <button type="submit">Submit</button>
+</form>
+
+{% if chart %}
+  <section class="chart">
+    {{ chart }}
+  </section>
+{% endif %}
+{% endblock %}
